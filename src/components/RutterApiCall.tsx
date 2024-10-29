@@ -53,12 +53,13 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
         body: body ? JSON.stringify(body) : undefined,
       });
 
-    if (res.ok) {
-      const data = await res.json();
-      setResponse({ status: res.status, data });
-    } else {
-        setError(`A ${res.status} error occurred while making the API call. ${res.statusText}`);
+    const data = await res.json();
+    setResponse({ status: res.status, data });
+
+    if (!res.ok) {
+        setError("An error occurred while making the API call.");
     }
+
     console.log(res);
     } catch (err) {
       setError(`An error occurred while making the API call: ${err}`);
@@ -118,7 +119,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
       {response && (
         <div className="p-4 border-b">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-700 font-medium">
+            <span className={error ? "text-sm text-red-700 font-medium" : "text-sm text-gray-700 font-medium"}>
               Response Status: {response.status}
             </span>
             <button

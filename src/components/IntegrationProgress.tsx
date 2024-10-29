@@ -230,7 +230,7 @@ export default function IntegrationProgress() {
               }}
               accessToken={accessToken}
             />
-            <MockApiCall
+            {/* <MockApiCall
               endpoint="/bank_feeds/accounts"
               method="POST"
               body={{
@@ -257,7 +257,7 @@ export default function IntegrationProgress() {
                   // ... other fields from request
                 },
               }}
-            />
+            /> */}
           </Section>
           <Section
             id="transactions"
