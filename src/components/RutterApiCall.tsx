@@ -46,11 +46,12 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
     const accessTokenParam = accessToken ? `?access_token=${accessToken}` : "";
     try {
       const res = await fetch(
-        `https://api.rutter.com${endpoint}${accessTokenParam}`,
+        `https://api.rutter.com/versioned${endpoint}${accessTokenParam}`,
         {
           method,
           headers: {
             "Content-Type": "application/json",
+            "X-Rutter-Version": "2024-08-31",
             Authorization: `Basic ${createRutterAuthorization()}`, // Set in .env file
             ...headers,
           },
