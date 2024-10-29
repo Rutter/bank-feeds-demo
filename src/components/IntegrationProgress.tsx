@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Check, ChevronDown, CircleDashed } from "lucide-react";
 import MockApiCall from "./MockApiCall";
+import RutterApiCall from "./RutterApiCall";
 
 export default function IntegrationProgress() {
   const [openSection, setOpenSection] = useState("create-connection");
@@ -168,7 +169,14 @@ export default function IntegrationProgress() {
               created, we'll use the <code>access_token</code> returned by
               Rutter's API to send along the rest of our bank feeds data.
             </p>
-            <MockApiCall
+            <RutterApiCall
+              endpoint="/connections/create"
+              method="POST"
+              body={{
+                platform: "INTUIT_BANK_FEEDS",
+              }}
+            />
+            {/* <MockApiCall
               endpoint="/connections/create"
               method="POST"
               body={{
@@ -183,7 +191,7 @@ export default function IntegrationProgress() {
                   name: "Example Connection",
                 },
               }}
-            />
+            /> */}
           </Section>
           <Section id="accounts" title="Step 3: Create Bank Feed Accounts">
             <p className="mb-4 text-gray-900">
@@ -300,15 +308,18 @@ export default function IntegrationProgress() {
           </Section>
           <Section id="redirect" title="Step 6: Finish the Redirect">
             <p className="mb-4 text-gray-900">
-              Now, append the OTP you generated in the previous step to the Rutter
-              redirect URI. Take the redirect URI, and add an <code>&otp=</code> query parameter:
+              Now, append the OTP you generated in the previous step to the
+              Rutter redirect URI. Take the redirect URI, and add an{" "}
+              <code>&otp=</code> query parameter:
             </p>
             <p className="font-mono bg-gray-100 p-2 rounded mt-2 text-gray-900">
               {redirectUri}&otp=01hMqZP
             </p>
             <br />
             <p className="mb-4 text-gray-900">
-              You now have a complete redirect URI. Redirect to this to allow your customers to finish the bank feeds connection flow within QuickBooks.
+              You now have a complete redirect URI. Redirect to this to allow
+              your customers to finish the bank feeds connection flow within
+              QuickBooks.
             </p>
           </Section>
         </div>
