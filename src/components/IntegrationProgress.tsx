@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { Check, ChevronDown, CircleDashed } from "lucide-react";
 import MockApiCall from "./MockApiCall";
 import RutterApiCall from "./RutterApiCall";
@@ -9,6 +9,7 @@ export default function IntegrationProgress() {
   const [openSection, setOpenSection] = useState("create-connection");
   const [redirectUri, setRedirectUri] = useState("");
   const [challenge, setChallenge] = useState("");
+  const [accessToken, setAccessToken] = useState("");
 
   const steps = {
     "rutter-redirect": true,
@@ -21,6 +22,8 @@ export default function IntegrationProgress() {
   };
 
   const [completedSteps, setCompletedSteps] = useState(steps);
+
+  const id = useId();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -207,6 +210,26 @@ export default function IntegrationProgress() {
               We'll use the <code>id</code> returned by Rutter's API to send
               along our transaction data in the next step.
             </p>
+            <p className="mb-4 text-gray-900">
+              <label htmlFor={id}>
+                Please provide the <code>access_token</code> from the previous
+                step:
+              </label>
+              <input
+                id={id}
+                value={accessToken}
+                onInput={(e) => setAccessToken(e.target.value)}
+                className="mb-4 text-gray-900"
+              />
+            </p>
+            <RutterApiCall
+              endpoint="/accounting/bank_feeds/accounts"
+              method="POST"
+              body={{
+                platform: "INTUIT_BANK_FEEDS",
+              }}
+              accessToken={accessToken}
+            />
             <MockApiCall
               endpoint="/bank_feeds/accounts"
               method="POST"

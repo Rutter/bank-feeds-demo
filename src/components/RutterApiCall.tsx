@@ -12,7 +12,7 @@ interface RutterApiCallProps {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: Record<string, any>;
   headers?: Record<string, string>;
-  access_token?: string;
+  accessToken?: string;
 }
 
 const RutterApiCall: React.FC<RutterApiCallProps> = ({
@@ -20,7 +20,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   method = "POST",
   body,
   headers,
-  access_token
+  accessToken
 }) => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,9 +41,9 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   const handleApiCall = async () => {
     setLoading(true);
     setError(null);
-    const access_token_param = access_token ? `?access_token=${access_token}` : "";
+    const accessTokenParam = accessToken ? `?access_token=${accessToken}` : "";
     try {
-      const res = await fetch(`https://api.rutter.com${endpoint}${access_token_param}`, {
+      const res = await fetch(`https://api.rutter.com${endpoint}${accessTokenParam}`, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -53,8 +53,13 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
         body: body ? JSON.stringify(body) : undefined,
       });
 
+    if (res.ok) {
       const data = await res.json();
       setResponse({ status: res.status, data });
+    } else {
+        setError(`A ${res.status} error occurred while making the API call. ${res.statusText}`);
+    }
+    console.log(res);
     } catch (err) {
       setError(`An error occurred while making the API call: ${err}`);
       console.log(err)
