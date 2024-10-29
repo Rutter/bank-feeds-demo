@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, ChevronDown, ChevronRight } from "lucide-react";
+import { Check, ChevronDown, CircleDashed } from "lucide-react";
 import MockApiCall from "./MockApiCall";
 
 export default function IntegrationProgress() {
@@ -37,7 +37,7 @@ export default function IntegrationProgress() {
             {completed ? (
               <Check className="w-4 h-4 text-green-600" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-gray-600" />
+              <CircleDashed className="w-4 h-4 text-gray-600" />
             )}
           </div>
           <span className="text-gray-900">{title}</span>
@@ -95,11 +95,17 @@ export default function IntegrationProgress() {
             completed={true}
           >
             <p className="text-gray-900">
-              Rutter redirected to your authentication flow, and appended a
-              redirect URI with challenge:
+              When your customer selected your financial institution in
+              QuickBooks, Rutter redirected to your login page using the URL you
+              provided in the Rutter Dashboard.
+            </p>
+            <br />
+            <p className="text-gray-900">
+              Appended to your login page is a Rutter redirect URI and challenge that
+              you&apos;ll need to use in Step 6 to complete the login:
             </p>
             <p className="font-mono bg-gray-100 p-2 rounded mt-2 text-gray-900">
-              {challenge}
+              {redirectUri}
             </p>
           </Section>
           <Section
@@ -142,25 +148,9 @@ export default function IntegrationProgress() {
               }}
             />
           </Section>
-          <Section id="otp" title="Step 3: Generate OTP" completed={false}>
-            <p className="mb-4 text-gray-900">
-              Now generate an OTP using Rutter's API. This tells Rutter that the
-              authentication was successful:
-            </p>
-            <MockApiCall
-              endpoint="/bank_feeds/otp"
-              method="POST"
-              mockResponse={{
-                bank_feed_otp: {
-                  expires_at: "2024-02-29T00:00:00.000Z",
-                  otp: "01HMQZP46BS69PN4PKTGYK6HMQ",
-                },
-              }}
-            />
-          </Section>
           <Section
             id="accounts"
-            title="Step 4: Create Bank Feed Accounts"
+            title="Step 3: Create Bank Feed Accounts"
             completed={false}
           >
             <p className="mb-4 text-gray-900">
@@ -197,7 +187,7 @@ export default function IntegrationProgress() {
           </Section>
           <Section
             id="transactions"
-            title="Step 5: Send Bank Feed Transactions"
+            title="Step 4: Send Bank Feed Transactions"
             completed={false}
           >
             <p className="mb-4 text-gray-900">
@@ -229,7 +219,23 @@ export default function IntegrationProgress() {
                 transactions_synced: 1,
               }}
             />
-          </Section>{" "}
+          </Section>
+          <Section id="otp" title="Step 5: Generate OTP" completed={false}>
+            <p className="mb-4 text-gray-900">
+              Now generate an OTP using Rutter's API. This tells Rutter that the
+              authentication was successful:
+            </p>
+            <MockApiCall
+              endpoint="/bank_feeds/otp"
+              method="POST"
+              mockResponse={{
+                bank_feed_otp: {
+                  expires_at: "2024-02-29T00:00:00.000Z",
+                  otp: "01HMQZP46BS69PN4PKTGYK6HMQ",
+                },
+              }}
+            />
+          </Section>
         </div>
       </div>
     </div>
