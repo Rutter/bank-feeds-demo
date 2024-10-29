@@ -148,9 +148,7 @@ export default function IntegrationProgress() {
               {redirectUri}
             </p>
           </Section>
-          <Section
-            id="auth"
-            title="✅ Step 1: Customer Logs In"          >
+          <Section id="auth" title="✅ Step 1: Customer Logs In">
             <p className="text-gray-900">
               Your customer provided their login details. Your system marked
               this as a successful authentication.
@@ -158,14 +156,17 @@ export default function IntegrationProgress() {
           </Section>
           <Section
             id="create-connection"
-            title="Step 2: Create a Bank Feeds Connection"          >
+            title="Step 2: Create a Bank Feeds Connection"
+          >
             <p className="mb-4 text-gray-900">
               Now that your customer has successfully logged in, you'll need to
               create a Rutter connection for them.
             </p>
             <p className="mb-4 text-gray-900">
               This connection will contain all the bank account and transaction
-              data for your customer that you want to sync to QuickBooks.
+              data for your customer that you want to sync to QuickBooks. Once
+              created, we'll use the <code>access_token</code> returned by
+              Rutter's API to send along the rest of our bank feeds data.
             </p>
             <MockApiCall
               endpoint="/connections/create"
@@ -184,12 +185,19 @@ export default function IntegrationProgress() {
               }}
             />
           </Section>
-          <Section
-            id="accounts"
-            title="Step 3: Create Bank Feed Accounts"
-          >
+          <Section id="accounts" title="Step 3: Create Bank Feed Accounts">
             <p className="mb-4 text-gray-900">
-              After authentication, create bank feed accounts:
+              Using the <code>access_token</code> returned in the previous step,
+              create bank feed accounts for this connection.
+              <br />
+              <br />
+              A bank feed account represent the financial account your customer
+              has at your institution—for example, a checking account, or a
+              credit card.
+              <br />
+              <br />
+              We'll use the <code>id</code> returned by Rutter's API to send
+              along our transaction data in the next step.
             </p>
             <MockApiCall
               endpoint="/bank_feeds/accounts"
@@ -210,7 +218,7 @@ export default function IntegrationProgress() {
               }}
               mockResponse={{
                 bank_feed_account: {
-                  id: "bfa_01HMQZP46BS69PN4PKTGYK6HMQ",
+                  id: "00000000-0000-0000-0000-000000000000",
                   account_id: "account-id",
                   feed_status: "active",
                   transaction_ready: true,
@@ -225,14 +233,16 @@ export default function IntegrationProgress() {
             title="Step 4: Send Bank Feed Transactions"
           >
             <p className="mb-4 text-gray-900">
-              Finally, sync transactions for the bank feed account:
+              Now, let's sync transactions for the bank feed account. Use the
+              Rutter <code>id</code> for the bank feed account that you created
+              in the previous step.
             </p>
             <MockApiCall
               endpoint="/bank_feeds/transactions"
               method="POST"
               body={{
                 bank_feed_transactions: {
-                  bank_feed_account_id: "bfa_01HMQZP46BS69PN4PKTGYK6HMQ",
+                  bank_feed_account_id: "00000000-0000-0000-0000-000000000000",
                   current_balance: 1234.56,
                   transactions: [
                     {
@@ -241,7 +251,6 @@ export default function IntegrationProgress() {
                       transaction_date: "2024-02-02T02:34:56.000Z",
                       amount: -300,
                       description: "Office supplies",
-                      memo: "Staples",
                       transaction_type: "debit",
                       debit_credit_memo: "DEBIT",
                     },
@@ -249,26 +258,58 @@ export default function IntegrationProgress() {
                 },
               }}
               mockResponse={{
-                success: true,
-                transactions_synced: 1,
+                bank_feed_transactions: [
+                  {
+                    id: "00000000-0000-0000-0000-000000000000",
+                    bank_feed_account_id:
+                      "00000000-0000-0000-0000-000000000000",
+                    transaction_id: "ACRAF23DB3C4",
+                    posted_at: "2024-02-02T02:34:56.000Z",
+                    transaction_date: "2024-02-02T02:34:56.000Z",
+                    amount: -300,
+                    description: "Office supplies",
+                    transaction_type: "debit",
+                    debit_credit_memo: "DEBIT",
+                    last_synced_at: "2023-01-02T02:34:56.000Z",
+                  },
+                ],
               }}
             />
           </Section>
           <Section id="otp" title="Step 5: Generate OTP">
             <p className="mb-4 text-gray-900">
-              Now generate an OTP using Rutter's API. This tells Rutter that the
-              authentication was successful:
+              You've successfully created a bank feed account and corresponding
+              transactions! Now, you'll prepare to complete the redirect, to the
+              redirect URI Rutter appended to your login page URL.
+              <br />
+              <br />
+              You'll need generate an OTP using Rutter's API. This tells Rutter
+              that your customer's authentication was successful:
             </p>
             <MockApiCall
               endpoint="/bank_feeds/otp"
               method="POST"
+              body={null}
               mockResponse={{
                 bank_feed_otp: {
                   expires_at: "2024-02-29T00:00:00.000Z",
-                  otp: "01HMQZP46BS69PN4PKTGYK6HMQ",
+                  otp: "01hMqZP",
                 },
               }}
             />
+          </Section>
+          <Section id="redirect" title="Step 6: Finish the Redirect">
+            <p className="mb-4 text-gray-900">
+              Now, append the OTP you generated in the previous step to the Rutter
+              redirect URI. Take the redirect URI, and add an <code>&otp=</code> query parameter:
+            </p>
+            <p className="font-mono bg-gray-100 p-2 rounded mt-2 text-gray-900">
+              {redirectUri}&otp=01hMqZP
+            </p>
+            <br />
+            <p className="mb-4 text-gray-900">
+              You now have a complete redirect URI. Redirect to this to allow your customers to finish the bank feeds connection flow within QuickBooks.
+            </p>
           </Section>
         </div>
       </div>
