@@ -57,6 +57,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
       setResponse({ status: res.status, data });
     } catch (err) {
       setError(`An error occurred while making the API call: ${err}`);
+      console.log(err)
     } finally {
       setLoading(false);
     }
@@ -90,9 +91,13 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
       </div>
       
       {error && (
-        <p style={{ color: "red", fontSize: "0.9em", marginTop: "10px" }}>
-          {error}
-        </p>
+        <div className="p-4 border-b">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-red-700 font-medium">
+                {error}
+            </span>
+        </div>
+        </div>
       )}
 
       {loading && (
