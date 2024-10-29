@@ -20,12 +20,14 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   method = "POST",
   body,
   headers,
-  accessToken
+  accessToken,
 }) => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const requestBody = body ? JSON.stringify(body, null, 2) : null;
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
@@ -43,27 +45,30 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
     setError(null);
     const accessTokenParam = accessToken ? `?access_token=${accessToken}` : "";
     try {
-      const res = await fetch(`https://api.rutter.com${endpoint}${accessTokenParam}`, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Basic ${createRutterAuthorization()}`, // Set in .env file
-          ...headers,
-        },
-        body: body ? JSON.stringify(body) : undefined,
-      });
+      const res = await fetch(
+        `https://api.rutter.com${endpoint}${accessTokenParam}`,
+        {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${createRutterAuthorization()}`, // Set in .env file
+            ...headers,
+          },
+          body: body ? JSON.stringify(body) : undefined,
+        }
+      );
 
-    const data = await res.json();
-    setResponse({ status: res.status, data });
+      const data = await res.json();
+      setResponse({ status: res.status, data });
 
-    if (!res.ok) {
+      if (!res.ok) {
         setError("An error occurred while making the API call.");
-    }
+      }
 
-    console.log(res);
+      console.log(res);
     } catch (err) {
       setError(`An error occurred while making the API call: ${err}`);
-      console.log(err)
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -95,14 +100,35 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
           Try it
         </button>
       </div>
-      
+
+      {requestBody && (
+        <div className="p-4 border-b">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-gray-700 font-medium">
+              Request Body:
+            </span>
+            <button
+              onClick={() => handleCopy(requestBody)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              {copied ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+          <pre className="bg-gray-900 text-gray-100 rounded-md p-4 overflow-x-auto">
+            <code>{requestBody}</code>
+          </pre>
+        </div>
+      )}
+
       {error && (
         <div className="p-4 border-b">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-red-700 font-medium">
-                {error}
-            </span>
-        </div>
+            <span className="text-sm text-red-700 font-medium">{error}</span>
+          </div>
         </div>
       )}
 
@@ -112,14 +138,20 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
             <span className="text-sm text-gray-700 font-medium">
               Loading...
             </span>
-        </div>
+          </div>
         </div>
       )}
 
       {response && (
         <div className="p-4 border-b">
           <div className="flex justify-between items-center mb-2">
-            <span className={error ? "text-sm text-red-700 font-medium" : "text-sm text-gray-700 font-medium"}>
+            <span
+              className={
+                error
+                  ? "text-sm text-red-700 font-medium"
+                  : "text-sm text-gray-700 font-medium"
+              }
+            >
               Response Status: {response.status}
             </span>
             <button
