@@ -212,18 +212,23 @@ export default function IntegrationProgress() {
               Copy the bank feed account <code>id</code> returned by Rutter's
               API to send along our transaction data in the next step.
             </p>
-            <p className="mb-4 text-gray-900">
-              <label htmlFor={id}>
-                Please provide the <code>access_token</code> from the previous
-                step:
+            <div className="mb-6">
+              <label
+                htmlFor={id}
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
+                Please provide the <code>access_token</code>
+                from the previous step:
               </label>
               <input
                 id={id}
                 value={accessToken}
                 onInput={(e) => setAccessToken(e.target.value)}
-                className="mb-4 text-gray-900"
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Enter access_token here"
               />
-            </p>
+            </div>
             <RutterApiCall
               endpoint="/accounting/bank_feeds/accounts"
               method="POST"
@@ -279,18 +284,23 @@ export default function IntegrationProgress() {
               Rutter <code>id</code> for the bank feed account that you created
               in the previous step.
             </p>
-            <p className="mb-4 text-gray-900">
-              <label htmlFor={id}>
-                Please provide the bank feed account Rutter <code>id</code> from
+            <div className="mb-6">
+              <label
+                htmlFor={id}
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
+                Please provide the Rutter bank feed account ID generated from
                 the previous step:
               </label>
               <input
                 id={id}
                 value={bankFeedAccountId}
                 onInput={(e) => setBankFeedAccountId(e.target.value)}
-                className="mb-4 text-gray-900"
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Enter Rutter bank feed account ID here"
               />
-            </p>
+            </div>
             <RutterApiCall
               endpoint="/accounting/bank_feeds/transactions"
               method="POST"
@@ -389,24 +399,29 @@ export default function IntegrationProgress() {
               Rutter redirect URI. Take the redirect URI, and add an{" "}
               <code>&otp=</code> query parameter.
             </p>
-            <p className="mb-4 text-gray-900">
-              <label htmlFor={id}>
-                Please provide the OTP Rutter generated from
-                the previous step:
+            <div className="mb-6">
+              <label
+                htmlFor={id}
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
+                Please provide the OTP Rutter generated from the previous step:
               </label>
               <input
                 id={id}
                 value={otp}
-                onInput={(e) => setOtp(e.target.value)}
-                className="mb-4 text-gray-900"
+                onChange={(e) => setOtp(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
+    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Enter OTP here"
               />
-            </p>
+            </div>{" "}
             <p className="font-mono bg-gray-100 p-2 rounded mt-2 text-gray-900">
               {redirectUri}&otp={otp}
             </p>
             <br />
             <p className="mb-4 text-gray-900">
-              You now have a complete redirect URI. Copy and paste this URL into your browser to finish the bank feeds connection flow within
+              You now have a complete redirect URI. Copy and paste this URL into
+              your browser to finish the bank feeds connection flow within
               QuickBooks.
             </p>
           </Section>
