@@ -12,6 +12,7 @@ interface RutterApiCallProps {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: Record<string, any>;
   headers?: Record<string, string>;
+  access_token?: string;
 }
 
 const RutterApiCall: React.FC<RutterApiCallProps> = ({
@@ -19,6 +20,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   method = "POST",
   body,
   headers,
+  access_token
 }) => {
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -39,8 +41,9 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   const handleApiCall = async () => {
     setLoading(true);
     setError(null);
+    const access_token_param = access_token ? `?access_token=${access_token}` : "";
     try {
-      const res = await fetch(`https://api.rutter.com${endpoint}`, {
+      const res = await fetch(`https://api.rutter.com${endpoint}${access_token_param}`, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -85,11 +88,23 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
           Try it
         </button>
       </div>
+      
       {error && (
         <p style={{ color: "red", fontSize: "0.9em", marginTop: "10px" }}>
           {error}
         </p>
       )}
+
+      {loading && (
+        <div className="p-4 border-b">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-gray-700 font-medium">
+              Loading...
+            </span>
+        </div>
+        </div>
+      )}
+
       {response && (
         <div className="p-4 border-b">
           <div className="flex justify-between items-center mb-2">
