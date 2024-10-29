@@ -9,6 +9,18 @@ export default function IntegrationProgress() {
   const [redirectUri, setRedirectUri] = useState("");
   const [challenge, setChallenge] = useState("");
 
+  const steps = {
+    "rutter-redirect": true,
+    auth: true,
+    "create-connection": false,
+    accounts: false,
+    transactions: false,
+    otp: false,
+    redirect: false,
+  };
+
+  const [completedSteps, setCompletedSteps] = useState(steps);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const uri = params.get("redirect_uri");
@@ -16,43 +28,72 @@ export default function IntegrationProgress() {
     setChallenge(uri?.split("challenge=")[1] || "");
   }, []);
 
-  const handleContinue = () => {
-    if (redirectUri) {
-      window.location.href = `${redirectUri}&otp=YOUR_OTP_HERE`;
-    }
-  };
+  const handleContinue = (currentStepKey: string) => {
+    const stepKeys = Object.keys(completedSteps); // Get the keys of the object
+    const currentIndex = stepKeys.indexOf(currentStepKey);
 
-  const Section = ({ id, title, completed, children }) => (
-    <div className="border rounded-lg mb-4 bg-white">
-      <button
-        className="w-full flex items-center justify-between p-4 font-medium text-left text-gray-900"
-        onClick={() => setOpenSection(openSection === id ? "" : id)}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className={`rounded-full p-1 ${
-              completed ? "bg-green-100" : "bg-gray-100"
-            }`}
-          >
-            {completed ? (
-              <Check className="w-4 h-4 text-green-600" />
-            ) : (
-              <CircleDashed className="w-4 h-4 text-gray-600" />
-            )}
+    // Get the next step key
+    const nextStepKey =
+      currentIndex < stepKeys.length - 1
+        ? stepKeys[currentIndex + 1]
+        : currentStepKey;
+
+    setOpenSection(nextStepKey);
+    setCompletedSteps((prev) => ({
+      ...prev,
+      [currentStepKey]: true,
+    }));
+    
+  };
+  
+  // const handleFinalRedirect = () => {
+  //   if (redirectUri) {
+  //     window.location.href = `${redirectUri}&otp=YOUR_OTP_HERE`;
+  //   }
+  // }
+
+  const Section = ({ id, title, children }) => {
+    const completed = completedSteps[id];
+    return (
+      <div className="border rounded-lg mb-4 bg-white">
+        <button
+          className="w-full flex items-center justify-between p-4 font-medium text-left text-gray-900"
+          onClick={() => setOpenSection(openSection === id ? "" : id)}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className={`rounded-full p-1 ${
+                completed ? "bg-green-100" : "bg-gray-100"
+              }`}
+            >
+              {completed ? (
+                <Check className="w-4 h-4 text-green-600" />
+              ) : (
+                <CircleDashed className="w-4 h-4 text-gray-600" />
+              )}
+            </div>
+            <span className="text-gray-900">{title}</span>
           </div>
-          <span className="text-gray-900">{title}</span>
-        </div>
-        <ChevronDown
-          className={`w-5 h-5 transition-transform ${
-            openSection === id ? "transform rotate-180" : ""
-          }`}
-        />
-      </button>
-      {openSection === id && (
-        <div className="p-4 border-t bg-white">{children}</div>
-      )}
-    </div>
-  );
+          <ChevronDown
+            className={`w-5 h-5 transition-transform ${
+              openSection === id ? "transform rotate-180" : ""
+            }`}
+          />
+        </button>
+        {openSection === id && (
+          <div className="p-4 border-t bg-white">
+            {children}
+            <button
+              onClick={() => handleContinue(id)}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  };
 
   const CodeBlock = ({ code }) => {
     const [copied, setCopied] = useState(false);
@@ -92,7 +133,6 @@ export default function IntegrationProgress() {
           <Section
             id="rutter-redirect"
             title="✅ Step 0: Rutter Redirects to Your Login Page"
-            completed={true}
           >
             <p className="text-gray-900">
               When your customer selected your financial institution in
@@ -101,8 +141,8 @@ export default function IntegrationProgress() {
             </p>
             <br />
             <p className="text-gray-900">
-              Appended to your login page is a Rutter redirect URI and challenge that
-              you&apos;ll need to use in Step 6 to complete the login:
+              Appended to your login page is a Rutter redirect URI and challenge
+              that you&apos;ll need to use in Step 6 to complete the login:
             </p>
             <p className="font-mono bg-gray-100 p-2 rounded mt-2 text-gray-900">
               {redirectUri}
@@ -110,9 +150,7 @@ export default function IntegrationProgress() {
           </Section>
           <Section
             id="auth"
-            title="✅ Step 1: Customer Logs In"
-            completed={true}
-          >
+            title="✅ Step 1: Customer Logs In"          >
             <p className="text-gray-900">
               Your customer provided their login details. Your system marked
               this as a successful authentication.
@@ -120,9 +158,7 @@ export default function IntegrationProgress() {
           </Section>
           <Section
             id="create-connection"
-            title="Step 2: Create a Bank Feeds Connection (You Are Here)"
-            completed={false}
-          >
+            title="Step 2: Create a Bank Feeds Connection"          >
             <p className="mb-4 text-gray-900">
               Now that your customer has successfully logged in, you'll need to
               create a Rutter connection for them.
@@ -151,7 +187,6 @@ export default function IntegrationProgress() {
           <Section
             id="accounts"
             title="Step 3: Create Bank Feed Accounts"
-            completed={false}
           >
             <p className="mb-4 text-gray-900">
               After authentication, create bank feed accounts:
@@ -188,7 +223,6 @@ export default function IntegrationProgress() {
           <Section
             id="transactions"
             title="Step 4: Send Bank Feed Transactions"
-            completed={false}
           >
             <p className="mb-4 text-gray-900">
               Finally, sync transactions for the bank feed account:
@@ -220,7 +254,7 @@ export default function IntegrationProgress() {
               }}
             />
           </Section>
-          <Section id="otp" title="Step 5: Generate OTP" completed={false}>
+          <Section id="otp" title="Step 5: Generate OTP">
             <p className="mb-4 text-gray-900">
               Now generate an OTP using Rutter's API. This tells Rutter that the
               authentication was successful:
