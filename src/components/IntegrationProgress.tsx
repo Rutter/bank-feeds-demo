@@ -277,8 +277,8 @@ export default function IntegrationProgress() {
                   transactions: [
                     {
                       transaction_id: "ACRAF23DB3C4",
-                      posted_at: "2023-02-02T02:34:56.000Z",
-                      transaction_date: "2023-02-02T02:34:56.000Z",
+                      posted_at: "2024-10-29T02:34:56.000Z",
+                      transaction_date: "2024-10-28T02:34:56.000Z",
                       amount: -300,
                       description: "Office supplies",
                       memo: "Staples",
