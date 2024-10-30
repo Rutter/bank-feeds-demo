@@ -8,7 +8,6 @@ import RutterApiCall from "./RutterApiCall";
 export default function IntegrationProgress() {
   const [openSection, setOpenSection] = useState("create-connection");
   const [redirectUri, setRedirectUri] = useState("");
-  const [challenge, setChallenge] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [bankFeedAccountId, setBankFeedAccountId] = useState("");
   const [otp, setOtp] = useState("");
@@ -31,7 +30,6 @@ export default function IntegrationProgress() {
     const params = new URLSearchParams(window.location.search);
     const uri = params.get("redirect_uri");
     setRedirectUri(uri || "");
-    setChallenge(uri?.split("challenge=")[1] || "");
   }, []);
 
   const handleContinue = (currentStepKey: string) => {
@@ -51,7 +49,7 @@ export default function IntegrationProgress() {
     }));
   };
 
-  const handleFinalRedirect = (fullRedirectUri) => {
+  const handleFinalRedirect = (fullRedirectUri: string) => {
     window.location.href = fullRedirectUri;
   };
 
@@ -94,34 +92,6 @@ export default function IntegrationProgress() {
             </button>
           </div>
         )}
-      </div>
-    );
-  };
-
-  const CodeBlock = ({ code }) => {
-    const [copied, setCopied] = useState(false);
-
-    const copyCode = () => {
-      navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    };
-
-    return (
-      <div className="relative">
-        <pre className="bg-gray-900 text-gray-100 rounded-md p-4 my-2 overflow-x-auto">
-          <code className="text-gray-100">{code}</code>
-        </pre>
-        <button
-          onClick={copyCode}
-          className="absolute top-2 right-2 p-2 rounded-md bg-gray-800 hover:bg-gray-700 text-gray-300"
-        >
-          {copied ? (
-            <Check className="w-4 h-4" />
-          ) : (
-            <Copy className="w-4 h-4" />
-          )}
-        </button>
       </div>
     );
   };
@@ -178,22 +148,6 @@ export default function IntegrationProgress() {
                 platform: "INTUIT_BANK_FEEDS",
               }}
             />
-            {/* <MockApiCall
-              endpoint="/connections/create"
-              method="POST"
-              body={{
-                platform: "INTUIT_BANK_FEEDS",
-              }}
-              mockResponse={{
-                connection: {
-                  id: "conn_01HMQZP46BS69PN4PKTGYK6HMQ",
-                  access_token: "at_01HMQZP46WQDZ9JBZJS52TN5GE",
-                  link_url:
-                    "https://link.rutterapi.com/connection/conn_01HMQZP46BS69PN4PKTGYK6HMQ",
-                  name: "Example Connection",
-                },
-              }}
-            /> */}
           </Section>
           <Section id="accounts" title="Step 3: Create Bank Feed Accounts">
             <p className="mb-4 text-gray-900">
@@ -206,7 +160,7 @@ export default function IntegrationProgress() {
               credit card.
               <br />
               <br />
-              Copy the bank feed account <code>id</code> returned by Rutter's
+              Copy the bank feed account <code>id</code> returned by Rutter&apos;s
               API to send along our transaction data to this account in the next
               step.
             </p>
@@ -215,15 +169,18 @@ export default function IntegrationProgress() {
                 htmlFor={id}
                 className="block text-sm font-medium text-gray-900 mb-2"
               >
-                Please provide the <code>access_token</code>
+                Please provide the access_token
                 from the previous step:
               </label>
               <input
                 id={id}
                 value={accessToken}
-                onInput={(e) => setAccessToken(e.target.value)}
-                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
-    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                autoFocus={true}
+                onInput={(e) => setAccessToken((e.target as HTMLTextAreaElement).value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                  text-gray-900 
+                  placeholder-gray-500
+                  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="Enter access_token here"
               />
             </div>
@@ -244,42 +201,14 @@ export default function IntegrationProgress() {
               }}
               accessToken={accessToken}
             />
-            {/* <MockApiCall
-              endpoint="/bank_feeds/accounts"
-              method="POST"
-              body={{
-                bank_feed_account: {
-                  account_id: "account-id",
-                  internal_bank_account_id: "bank-account-id",
-                  transaction_start_date: "2024-02-02T00:00:00.000Z",
-                  bank_account_type: "bank",
-                  currency_code: "USD",
-                  name: "Example Bank Account",
-                  available_balance: 1546.23,
-                  bank_account_number: "182237382",
-                  current_balance: 1833.21,
-                  routing_number: "123456789",
-                },
-              }}
-              mockResponse={{
-                bank_feed_account: {
-                  id: "00000000-0000-0000-0000-000000000000",
-                  account_id: "account-id",
-                  feed_status: "active",
-                  transaction_ready: true,
-                  name: "Example Bank Account",
-                  // ... other fields from request
-                },
-              }}
-            /> */}
           </Section>
           <Section
             id="transactions"
             title="Step 4: Send Bank Feed Transactions"
           >
             <p className="mb-4 text-gray-900">
-              Now, let's sync over the transactions for the bank feed account.
-              You can sync up to two years of your customer's historical
+              Now, let&apos;s sync over the transactions for the bank feed account.
+              You can sync up to two years of your customer&apos;s historical
               transactions for this account. Use the Rutter <code>id</code> for
               the bank feed account that you created in the previous step.
             </p>
@@ -294,9 +223,12 @@ export default function IntegrationProgress() {
               <input
                 id={id}
                 value={bankFeedAccountId}
-                onInput={(e) => setBankFeedAccountId(e.target.value)}
-                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
-    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                autoFocus={true}
+                onInput={(e) => setBankFeedAccountId((e.target as HTMLTextAreaElement).value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                  text-gray-900 
+                  placeholder-gray-500
+                  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="Enter Rutter bank feed account ID here"
               />
             </div>
@@ -323,44 +255,6 @@ export default function IntegrationProgress() {
               }}
               accessToken={accessToken}
             />
-            {/* <MockApiCall
-              endpoint="/bank_feeds/transactions"
-              method="POST"
-              body={{
-                bank_feed_transactions: {
-                  bank_feed_account_id: "00000000-0000-0000-0000-000000000000",
-                  current_balance: 1234.56,
-                  transactions: [
-                    {
-                      transaction_id: "ACRAF23DB3C4",
-                      posted_at: "2024-02-02T02:34:56.000Z",
-                      transaction_date: "2024-02-02T02:34:56.000Z",
-                      amount: -300,
-                      description: "Office supplies",
-                      transaction_type: "debit",
-                      debit_credit_memo: "DEBIT",
-                    },
-                  ],
-                },
-              }}
-              mockResponse={{
-                bank_feed_transactions: [
-                  {
-                    id: "00000000-0000-0000-0000-000000000000",
-                    bank_feed_account_id:
-                      "00000000-0000-0000-0000-000000000000",
-                    transaction_id: "ACRAF23DB3C4",
-                    posted_at: "2024-02-02T02:34:56.000Z",
-                    transaction_date: "2024-02-02T02:34:56.000Z",
-                    amount: -300,
-                    description: "Office supplies",
-                    transaction_type: "debit",
-                    debit_credit_memo: "DEBIT",
-                    last_synced_at: "2023-01-02T02:34:56.000Z",
-                  },
-                ],
-              }}
-            /> */}
           </Section>
           <Section id="generate-otp" title="Step 5: Generate OTP">
             <p className="mb-4 text-gray-900">
@@ -376,21 +270,8 @@ export default function IntegrationProgress() {
             <RutterApiCall
               endpoint="/accounting/bank_feeds/otp"
               method="POST"
-              // body={{}}
               accessToken={accessToken}
             />
-
-            {/* <MockApiCall
-              endpoint="/bank_feeds/otp"
-              method="POST"
-              body={null}
-              mockResponse={{
-                bank_feed_otp: {
-                  expires_at: "2024-02-29T00:00:00.000Z",
-                  otp: "01hMqZP",
-                },
-              }}
-            /> */}
           </Section>
           <Section id="redirect" title="Step 6: Finish the Redirect">
             <p className="mb-4 text-gray-900">
@@ -406,11 +287,15 @@ export default function IntegrationProgress() {
                 Please provide the OTP Rutter generated from the previous step:
               </label>
               <input
+                key="otp"
                 id={id}
                 value={otp}
+                autoFocus={true}
                 onChange={(e) => setOtp(e.target.value)}
-                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 
-    focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                  text-gray-900 
+                  placeholder-gray-500
+                  focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="Enter OTP here"
               />
             </div>{" "}
