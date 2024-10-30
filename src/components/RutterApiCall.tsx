@@ -1,4 +1,3 @@
-// RutterApiCall.tsx
 import React, { useState } from "react";
 import { Check, Copy, Play } from "lucide-react";
 
@@ -13,6 +12,8 @@ interface RutterApiCallProps {
   body?: Record<string, any>;
   headers?: Record<string, string>;
   accessToken?: string;
+  onResponse?: (response: ApiResponse) => void;
+  savedResponse?: ApiResponse | null;
 }
 
 const RutterApiCall: React.FC<RutterApiCallProps> = ({
@@ -21,15 +22,16 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   body,
   headers,
   accessToken,
+  onResponse,
+  savedResponse,
 }) => {
-  const [response, setResponse] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const requestBody = body ? JSON.stringify(body, null, 2) : null;
 
-  const handleCopy = (text) => {
+  const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -52,7 +54,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
           headers: {
             "Content-Type": "application/json",
             "X-Rutter-Version": "2024-08-31",
-            Authorization: `Basic ${createRutterAuthorization()}`, // Set in .env file
+            Authorization: `Basic ${createRutterAuthorization()}`,
             ...headers,
           },
           body: body ? JSON.stringify(body) : undefined,
@@ -60,13 +62,14 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
       );
 
       const data = await res.json();
-      setResponse({ status: res.status, data });
+      const response = { status: res.status, data };
 
       if (!res.ok) {
         setError("An error occurred while making the API call.");
       }
 
-      console.log(res);
+      // Call the onResponse callback with the new response
+      onResponse?.(response);
     } catch (err) {
       setError(`An error occurred while making the API call: ${err}`);
       console.log(err);
@@ -143,7 +146,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
         </div>
       )}
 
-      {response && (
+      {savedResponse && (
         <div className="p-4 border-b">
           <div className="flex justify-between items-center mb-2">
             <span
@@ -153,10 +156,12 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
                   : "text-sm text-gray-700 font-medium"
               }
             >
-              Response Status: {response.status}
+              Response Status: {savedResponse.status}
             </span>
             <button
-              onClick={() => handleCopy(JSON.stringify(response.data, null, 2))}
+              onClick={() =>
+                handleCopy(JSON.stringify(savedResponse.data, null, 2))
+              }
               className="text-gray-500 hover:text-gray-700"
             >
               {copied ? (
@@ -167,7 +172,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
             </button>
           </div>
           <pre className="bg-gray-900 text-gray-100 rounded-md p-4 overflow-x-auto">
-            <code>{JSON.stringify(response.data, null, 2)}</code>
+            <code>{JSON.stringify(savedResponse.data, null, 2)}</code>
           </pre>
         </div>
       )}

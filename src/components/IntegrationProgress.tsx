@@ -4,12 +4,28 @@ import { useState, useEffect, useId } from "react";
 import { Check, ChevronDown, CircleDashed } from "lucide-react";
 import RutterApiCall from "./RutterApiCall";
 
+interface ApiResponse {
+  status: number;
+  data: any;
+}
+
+interface ApiResponses {
+  [key: string]: ApiResponse | null;
+}
+
 export default function IntegrationProgress() {
   const [openSection, setOpenSection] = useState("create-connection");
   const [redirectUri, setRedirectUri] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [bankFeedAccountId, setBankFeedAccountId] = useState("");
   const [otp, setOtp] = useState("");
+  // Add state for API responses
+  const [apiResponses, setApiResponses] = useState<ApiResponses>({
+    "create-connection": null,
+    accounts: null,
+    transactions: null,
+    "generate-otp": null,
+  });
 
   const steps = {
     "rutter-redirect": true,
@@ -31,11 +47,16 @@ export default function IntegrationProgress() {
     setRedirectUri(uri || "");
   }, []);
 
-  const handleContinue = (currentStepKey: string) => {
-    const stepKeys = Object.keys(completedSteps); // Get the keys of the object
-    const currentIndex = stepKeys.indexOf(currentStepKey);
+  const handleApiResponse = (sectionId: string, response: ApiResponse) => {
+    setApiResponses((prev) => ({
+      ...prev,
+      [sectionId]: response,
+    }));
+  };
 
-    // Get the next step key
+  const handleContinue = (currentStepKey: string) => {
+    const stepKeys = Object.keys(completedSteps);
+    const currentIndex = stepKeys.indexOf(currentStepKey);
     const nextStepKey =
       currentIndex < stepKeys.length - 1
         ? stepKeys[currentIndex + 1]
@@ -80,17 +101,22 @@ export default function IntegrationProgress() {
             }`}
           />
         </button>
-        {openSection === id && (
-          <div className="p-4 border-t bg-white">
-            {children}
-            {!overrideButton && <button
+        {/* Always render children, but hide them when section is closed */}
+        <div
+          className={`${
+            openSection === id ? "block" : "hidden"
+          } p-4 border-t bg-white`}
+        >
+          {children}
+          {!overrideButton && (
+            <button
               onClick={() => handleContinue(id)}
               className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700"
             >
               Continue
-            </button>}
-          </div>
-        )}
+            </button>
+          )}
+        </div>
       </div>
     );
   };
@@ -131,14 +157,14 @@ export default function IntegrationProgress() {
             title="Step 2: Create a Bank Feeds Connection"
           >
             <p className="mb-4 text-gray-900">
-              Now that your customer has successfully logged in, you&apos;ll need to
-              create a Rutter connection for them.
+              Now that your customer has successfully logged in, you&apos;ll
+              need to create a Rutter connection for them.
             </p>
             <p className="mb-4 text-gray-900">
               This connection will contain all the bank account and transaction
               data for your customer that you want to sync to QuickBooks. Once
-              created, copy the <code>access_token</code> returned by Rutter&apos;s
-              API to send along the rest of our bank feeds data.
+              created, copy the <code>access_token</code> returned by
+              Rutter&apos;s API to send along the rest of our bank feeds data.
             </p>
             <RutterApiCall
               endpoint="/connections/create"
@@ -146,6 +172,10 @@ export default function IntegrationProgress() {
               body={{
                 platform: "INTUIT_BANK_FEEDS",
               }}
+              onResponse={(response) =>
+                handleApiResponse("create-connection", response)
+              }
+              savedResponse={apiResponses["create-connection"]}
             />
           </Section>
           <Section id="accounts" title="Step 3: Create Bank Feed Accounts">
@@ -159,23 +189,24 @@ export default function IntegrationProgress() {
               credit card.
               <br />
               <br />
-              Copy the bank feed account <code>id</code> returned by Rutter&apos;s
-              API to send along our transaction data to this account in the next
-              step.
+              Copy the bank feed account <code>id</code> returned by
+              Rutter&apos;s API to send along our transaction data to this
+              account in the next step.
             </p>
             <div className="mb-6">
               <label
                 htmlFor={id}
                 className="block text-sm font-medium text-gray-900 mb-2"
               >
-                Please provide the access_token
-                from the previous step:
+                Please provide the access_token from the previous step:
               </label>
               <input
                 id={id}
                 value={accessToken}
                 autoFocus={true}
-                onInput={(e) => setAccessToken((e.target as HTMLTextAreaElement).value)}
+                onInput={(e) =>
+                  setAccessToken((e.target as HTMLTextAreaElement).value)
+                }
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                   text-gray-900 
                   placeholder-gray-500
@@ -199,6 +230,8 @@ export default function IntegrationProgress() {
                 },
               }}
               accessToken={accessToken}
+              onResponse={(response) => handleApiResponse("accounts", response)}
+              savedResponse={apiResponses["accounts"]}
             />
           </Section>
           <Section
@@ -206,10 +239,11 @@ export default function IntegrationProgress() {
             title="Step 4: Send Bank Feed Transactions"
           >
             <p className="mb-4 text-gray-900">
-              Now, let&apos;s sync over the transactions for the bank feed account.
-              You can sync up to two years of your customer&apos;s historical
-              transactions for this account. Use the Rutter <code>id</code> for
-              the bank feed account that you created in the previous step.
+              Now, let&apos;s sync over the transactions for the bank feed
+              account. You can sync up to two years of your customer&apos;s
+              historical transactions for this account. Use the Rutter{" "}
+              <code>id</code> for the bank feed account that you created in the
+              previous step.
             </p>
             <div className="mb-6">
               <label
@@ -223,7 +257,9 @@ export default function IntegrationProgress() {
                 id={id}
                 value={bankFeedAccountId}
                 autoFocus={true}
-                onInput={(e) => setBankFeedAccountId((e.target as HTMLTextAreaElement).value)}
+                onInput={(e) =>
+                  setBankFeedAccountId((e.target as HTMLTextAreaElement).value)
+                }
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                   text-gray-900 
                   placeholder-gray-500
@@ -253,26 +289,39 @@ export default function IntegrationProgress() {
                 },
               }}
               accessToken={accessToken}
+              onResponse={(response) =>
+                handleApiResponse("transactions", response)
+              }
+              savedResponse={apiResponses["transactions"]}
             />
           </Section>
           <Section id="generate-otp" title="Step 5: Generate OTP">
             <p className="mb-4 text-gray-900">
-              You&apos;ve successfully created a bank feed account and corresponding
-              transactions! Now, you&apos;ll prepare to complete the redirect, to the
-              redirect URI Rutter appended to your login page URL.
+              You&apos;ve successfully created a bank feed account and
+              corresponding transactions! Now, you&apos;ll prepare to complete
+              the redirect, to the redirect URI Rutter appended to your login
+              page URL.
               <br />
               <br />
-              You&apos;ll need to generate an OTP using Rutter&apos;s API. This tells
-              Rutter that your customer&apos;s authentication was successful. Copy
-              the OTP once you&apos;ve generated it:
+              You&apos;ll need to generate an OTP using Rutter&apos;s API. This
+              tells Rutter that your customer&apos;s authentication was
+              successful. Copy the OTP once you&apos;ve generated it:
             </p>
             <RutterApiCall
               endpoint="/accounting/bank_feeds/otp"
               method="POST"
               accessToken={accessToken}
+              onResponse={(response) =>
+                handleApiResponse("generate-otp", response)
+              }
+              savedResponse={apiResponses["generate-otp"]}
             />
           </Section>
-          <Section id="redirect" title="Step 6: Finish the Redirect" overrideButton={true}>
+          <Section
+            id="redirect"
+            title="Step 6: Finish the Redirect"
+            overrideButton={true}
+          >
             <p className="mb-4 text-gray-900">
               Now, append the OTP you generated in the previous step to the
               Rutter redirect URI. Take the redirect URI, and add an{" "}
