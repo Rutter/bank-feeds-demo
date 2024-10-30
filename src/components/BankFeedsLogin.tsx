@@ -42,6 +42,9 @@ export default function BankFeedsLogin({ onSuccess }) {
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Sign in to your bank account
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            (Imagine your custom login page here!)
+          </p>
         </div>
 
         {error && (
