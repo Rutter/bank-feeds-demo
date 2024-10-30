@@ -52,7 +52,7 @@ export default function IntegrationProgress() {
     window.location.href = fullRedirectUri;
   };
 
-  const Section = ({ id, title, children }) => {
+  const Section = ({ id, title, children, overrideButton = false }) => {
     const completed = completedSteps[id];
     return (
       <div className="border rounded-lg mb-4 bg-white">
@@ -83,12 +83,12 @@ export default function IntegrationProgress() {
         {openSection === id && (
           <div className="p-4 border-t bg-white">
             {children}
-            <button
+            {!overrideButton && <button
               onClick={() => handleContinue(id)}
               className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700"
             >
               Continue
-            </button>
+            </button>}
           </div>
         )}
       </div>
@@ -272,7 +272,7 @@ export default function IntegrationProgress() {
               accessToken={accessToken}
             />
           </Section>
-          <Section id="redirect" title="Step 6: Finish the Redirect">
+          <Section id="redirect" title="Step 6: Finish the Redirect" overrideButton={true}>
             <p className="mb-4 text-gray-900">
               Now, append the OTP you generated in the previous step to the
               Rutter redirect URI. Take the redirect URI, and add an{" "}
