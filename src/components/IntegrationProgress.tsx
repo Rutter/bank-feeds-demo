@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useId } from "react";
 import { Check, ChevronDown, CircleDashed } from "lucide-react";
-import MockApiCall from "./MockApiCall";
 import RutterApiCall from "./RutterApiCall";
 
 export default function IntegrationProgress() {
@@ -132,13 +131,13 @@ export default function IntegrationProgress() {
             title="Step 2: Create a Bank Feeds Connection"
           >
             <p className="mb-4 text-gray-900">
-              Now that your customer has successfully logged in, you'll need to
+              Now that your customer has successfully logged in, you&apos;ll need to
               create a Rutter connection for them.
             </p>
             <p className="mb-4 text-gray-900">
               This connection will contain all the bank account and transaction
               data for your customer that you want to sync to QuickBooks. Once
-              created, copy the <code>access_token</code> returned by Rutter's
+              created, copy the <code>access_token</code> returned by Rutter&apos;s
               API to send along the rest of our bank feeds data.
             </p>
             <RutterApiCall
@@ -258,14 +257,14 @@ export default function IntegrationProgress() {
           </Section>
           <Section id="generate-otp" title="Step 5: Generate OTP">
             <p className="mb-4 text-gray-900">
-              You've successfully created a bank feed account and corresponding
-              transactions! Now, you'll prepare to complete the redirect, to the
+              You&apos;ve successfully created a bank feed account and corresponding
+              transactions! Now, you&apos;ll prepare to complete the redirect, to the
               redirect URI Rutter appended to your login page URL.
               <br />
               <br />
-              You'll need to generate an OTP using Rutter's API. This tells
-              Rutter that your customer's authentication was successful. Copy
-              the OTP once you've generated it:
+              You&apos;ll need to generate an OTP using Rutter&apos;s API. This tells
+              Rutter that your customer&apos;s authentication was successful. Copy
+              the OTP once you&apos;ve generated it:
             </p>
             <RutterApiCall
               endpoint="/accounting/bank_feeds/otp"
