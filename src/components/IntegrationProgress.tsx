@@ -49,14 +49,11 @@ export default function IntegrationProgress() {
       ...prev,
       [currentStepKey]: true,
     }));
-    
   };
-  
-  // const handleFinalRedirect = () => {
-  //   if (redirectUri) {
-  //     window.location.href = `${redirectUri}&otp=YOUR_OTP_HERE`;
-  //   }
-  // }
+
+  const handleFinalRedirect = (fullRedirectUri) => {
+    window.location.href = fullRedirectUri;
+  };
 
   const Section = ({ id, title, children }) => {
     const completed = completedSteps[id];
@@ -98,7 +95,7 @@ export default function IntegrationProgress() {
           </div>
         )}
       </div>
-    )
+    );
   };
 
   const CodeBlock = ({ code }) => {
@@ -210,7 +207,8 @@ export default function IntegrationProgress() {
               <br />
               <br />
               Copy the bank feed account <code>id</code> returned by Rutter's
-              API to send along our transaction data in the next step.
+              API to send along our transaction data to this account in the next
+              step.
             </p>
             <div className="mb-6">
               <label
@@ -280,9 +278,10 @@ export default function IntegrationProgress() {
             title="Step 4: Send Bank Feed Transactions"
           >
             <p className="mb-4 text-gray-900">
-              Now, let's sync transactions for the bank feed account. Use the
-              Rutter <code>id</code> for the bank feed account that you created
-              in the previous step.
+              Now, let's sync over the transactions for the bank feed account.
+              You can sync up to two years of your customer's historical
+              transactions for this account. Use the Rutter <code>id</code> for
+              the bank feed account that you created in the previous step.
             </p>
             <div className="mb-6">
               <label
@@ -420,10 +419,16 @@ export default function IntegrationProgress() {
             </p>
             <br />
             <p className="mb-4 text-gray-900">
-              You now have a complete redirect URI. Copy and paste this URL into
-              your browser to finish the bank feeds connection flow within
-              QuickBooks.
+              You now have a complete redirect URI. Click the button below to
+              redirect to this URL. Then, you can finish the bank feeds
+              connection flow within QuickBooks.
             </p>
+            <button
+              onClick={() => handleFinalRedirect(`${redirectUri}&otp=${otp}`)}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-3 py-1.5 rounded text-sm hover:bg-indigo-700"
+            >
+              Continue
+            </button>
           </Section>
         </div>
       </div>

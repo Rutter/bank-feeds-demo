@@ -2,16 +2,12 @@
 
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 
 export default function BankFeedsLogin({ onSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const searchParams = useSearchParams();
-  const redirectUri = searchParams.get("redirect_uri");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
