@@ -1,6 +1,6 @@
 ## Intro
 
-This project is designed to help you get started with Rutter's [Intuit Bank Feeds](https://docs.rutter.com/guides/intuit-bank-feeds) product. You can use this project as an interactive interface for walking you through the process of setting up a new Rutter Intuit Bank Feed connection.
+This project is designed to help you get started with Rutter's [Intuit Bank Feeds](https://docs.rutter.com/guides/intuit-bank-feeds) product. It gives you a redirect URL that, when redirected to, shows you every step you need to go through to finish creating an Intuit Bank Feeds connection. You can use this project as an interactive interface for walking you through the process of setting up a new Rutter Intuit Bank Feed connection.
 
 ![Intuit Bank Feeds Demo](https://github.com/user-attachments/assets/513a5ae7-619a-4f39-84f0-50a297dcb07c)
 
