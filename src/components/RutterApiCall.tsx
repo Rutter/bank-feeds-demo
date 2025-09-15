@@ -48,7 +48,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
     const accessTokenParam = accessToken ? `?access_token=${accessToken}` : "";
     try {
       const res = await fetch(
-        `https://api.rutter.com/versioned${endpoint}${accessTokenParam}`,
+        `https://production.rutterapi.com/versioned${endpoint}${accessTokenParam}`,
         {
           method,
           headers: {
