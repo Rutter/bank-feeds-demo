@@ -1,11 +1,21 @@
-import { useState } from "react";
 import { Check, Copy, Play } from "lucide-react";
+import { useState } from "react";
 
-const MockApiCall = ({ endpoint, method, body, mockResponse }) => {
+const MockApiCall = ({
+    endpoint,
+    method,
+    body,
+    mockResponse,
+}: {
+    endpoint: string;
+    method: any;
+    body: any;
+    mockResponse: any;
+}) => {
   const [showResponse, setShowResponse] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = (text) => {
+  const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
