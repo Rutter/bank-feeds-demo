@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { AlertCircle } from "lucide-react";
+import { useState } from "react";
 
-export default function BankFeedsLogin({ onSuccess }) {
+export default function BankFeedsLogin({ onSuccess }: { onSuccess: any }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
@@ -24,8 +24,8 @@ export default function BankFeedsLogin({ onSuccess }) {
 
       // Call onSuccess instead of redirecting directly
       onSuccess();
-    } catch (err) {
-      setError(err.message);
+    } catch (err: any) {
+      setError(err?.message || "");
     } finally {
       setIsLoading(false);
     }

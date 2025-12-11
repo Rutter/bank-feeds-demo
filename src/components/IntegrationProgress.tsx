@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useId } from "react";
 import { Check, ChevronDown, CircleDashed } from "lucide-react";
+import { ReactNode, useEffect, useId, useState } from "react";
 import RutterApiCall from "./RutterApiCall";
 
 interface ApiResponse {
@@ -37,7 +37,7 @@ export default function IntegrationProgress() {
     redirect: false,
   };
 
-  const [completedSteps, setCompletedSteps] = useState(steps);
+  const [completedSteps, setCompletedSteps] = useState<any>(steps);
 
   const id = useId();
 
@@ -63,7 +63,7 @@ export default function IntegrationProgress() {
         : currentStepKey;
 
     setOpenSection(nextStepKey);
-    setCompletedSteps((prev) => ({
+    setCompletedSteps((prev: any) => ({
       ...prev,
       [currentStepKey]: true,
     }));
@@ -73,7 +73,17 @@ export default function IntegrationProgress() {
     window.location.href = fullRedirectUri;
   };
 
-  const Section = ({ id, title, children, overrideButton = false }) => {
+  const Section = ({
+      id,
+      title,
+      children,
+      overrideButton = false,
+  }: {
+      id: string;
+      title: string;
+      children: ReactNode;
+      overrideButton?: boolean;
+  }) => {
     const completed = completedSteps[id];
     return (
       <div className="border rounded-lg mb-4 bg-white">
