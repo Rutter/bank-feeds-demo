@@ -14,6 +14,7 @@ interface RutterApiCallProps {
   accessToken?: string;
   onResponse?: (response: ApiResponse) => void;
   savedResponse?: ApiResponse | null;
+  mockResponse?: ApiResponse;
 }
 
 const RutterApiCall: React.FC<RutterApiCallProps> = ({
@@ -24,6 +25,7 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   accessToken,
   onResponse,
   savedResponse,
+  mockResponse,
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,10 +47,23 @@ const RutterApiCall: React.FC<RutterApiCallProps> = ({
   const handleApiCall = async () => {
     setLoading(true);
     setError(null);
-    const accessTokenParam = accessToken ? `?access_token=${accessToken}` : "";
+    
+    // If mockResponse is provided, use it instead of making a real API call
+    if (mockResponse) {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      onResponse?.(mockResponse);
+      setLoading(false);
+      return;
+    }
+    
+    const accessTokenParam = accessToken ? `access_token=${accessToken}` : "";
+    const separator = endpoint.includes('?') ? '&' : '?';
+    const fullEndpoint = accessToken ? `${endpoint}${separator}${accessTokenParam}` : endpoint;
+    
     try {
       const res = await fetch(
-        `https://production.rutterapi.com/versioned${endpoint}${accessTokenParam}`,
+        `https://production.rutterapi.com/versioned${fullEndpoint}`,
         {
           method,
           headers: {
